@@ -3,6 +3,7 @@ package com.woragis.campusworld.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.woragis.campusworld.api.dto.ApiErrorResponse;
+import com.woragis.campusworld.api.dto.GuildResponse;
 import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.api.dto.PlayerResponse;
 import com.woragis.campusworld.api.dto.WhitelistResponse;
@@ -67,6 +68,24 @@ public class CampusWorldApiClient {
         }
     }
 
+    public GuildResponse createGuild(UUID leaderUuid, String name) throws ApiException {
+        Map<String, String> body = Map.of(
+                "leaderUuid", leaderUuid.toString(),
+                "name", name
+        );
+        return post("/v1/internal/guilds", body, GuildResponse.class);
+    }
+
+    public void joinGuild(String guildId, UUID playerUuid) throws ApiException {
+        Map<String, String> body = Map.of("playerUuid", playerUuid.toString());
+        post("/v1/internal/guilds/" + guildId + "/join", body, Void.class);
+    }
+
+    public void leaveGuild(String guildId, UUID playerUuid) throws ApiException {
+        Map<String, String> body = Map.of("playerUuid", playerUuid.toString());
+        post("/v1/internal/guilds/" + guildId + "/leave", body, Void.class);
+    }
+
     public InviteResponse createInvite(UUID sponsorUuid, String targetUsername) throws ApiException {
         Map<String, String> body = Map.of(
                 "sponsorUuid", sponsorUuid.toString(),
@@ -107,8 +126,8 @@ public class CampusWorldApiClient {
             String body = response.body() == null ? "" : response.body();
 
             if (status >= 200 && status < 300) {
-                if (body.isBlank()) {
-                    throw new ApiException("API returned empty body with status " + status);
+                if (type == Void.class || body.isBlank()) {
+                    return null;
                 }
                 return gson.fromJson(body, type);
             }

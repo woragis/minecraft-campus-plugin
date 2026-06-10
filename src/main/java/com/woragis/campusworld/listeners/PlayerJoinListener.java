@@ -3,7 +3,9 @@ package com.woragis.campusworld.listeners;
 import com.woragis.campusworld.CampusWorldPlugin;
 import com.woragis.campusworld.api.ApiException;
 import com.woragis.campusworld.api.CampusWorldApiClient;
+import com.woragis.campusworld.api.dto.PlayerResponse;
 import com.woragis.campusworld.config.PluginConfig;
+import com.woragis.campusworld.session.PlayerSessionCache;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +32,10 @@ public class PlayerJoinListener implements Listener {
 
     private void syncPlayer(Player player) {
         try {
-            api.upsertPlayer(player.getUniqueId(), player.getName());
+            PlayerResponse response = api.upsertPlayer(player.getUniqueId(), player.getName());
+            if (response != null && response.getStatus() != null) {
+                PlayerSessionCache.get().put(player.getUniqueId(), response.getStatus());
+            }
         } catch (ApiException e) {
             plugin.getLogger().warning("Upsert falhou para " + player.getName() + ": " + e.getMessage());
         }

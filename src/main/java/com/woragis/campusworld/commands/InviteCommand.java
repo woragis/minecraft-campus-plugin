@@ -5,6 +5,7 @@ import com.woragis.campusworld.api.ApiException;
 import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.config.PluginConfig;
+import com.woragis.campusworld.session.PlayerSessionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -42,6 +43,10 @@ public class InviteCommand implements CommandExecutor, TabCompleter {
         String targetUsername = args[0].trim();
         if (targetUsername.isEmpty()) {
             player.sendMessage(config.inviteUsage());
+            return true;
+        }
+        if (PlayerSessionCache.get().isProbation(player.getUniqueId())) {
+            player.sendMessage(config.inviteProbationDenied());
             return true;
         }
 

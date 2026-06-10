@@ -2,6 +2,7 @@ package com.woragis.campusworld;
 
 import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.commands.CampusCommand;
+import com.woragis.campusworld.commands.GuildCommand;
 import com.woragis.campusworld.commands.InviteCommand;
 import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.listeners.PlayerJoinListener;
@@ -36,6 +37,13 @@ public final class CampusWorldPlugin extends JavaPlugin {
             var campus = new CampusCommand(apiClient, pluginConfig);
             campusCommand.setExecutor(campus);
             campusCommand.setTabCompleter(campus);
+        }
+
+        var guildCommand = getCommand("guild");
+        if (guildCommand != null) {
+            var guild = new GuildCommand(this, apiClient, pluginConfig);
+            guildCommand.setExecutor(guild);
+            guildCommand.setTabCompleter(guild);
         }
 
         getLogger().info("CampusWorld ativo. API: " + pluginConfig.apiBaseUrl() + " | servidor: " + pluginConfig.serverSlug());

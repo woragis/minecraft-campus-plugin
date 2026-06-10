@@ -17,7 +17,14 @@ public record PluginConfig(
         String inviteUsage,
         String campusUsage,
         String campusStatusOk,
-        String campusStatusError
+        String campusStatusError,
+        String inviteProbationDenied,
+        String guildUsage,
+        String guildCreated,
+        String guildJoined,
+        String guildLeft,
+        String guildFailed,
+        String guildProbationDenied
 ) {
     public static PluginConfig load(FileConfiguration config) {
         return new PluginConfig(
@@ -34,7 +41,14 @@ public record PluginConfig(
                 color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>")),
                 color(config.getString("messages.campus-usage", "&eUso: /campus status")),
                 color(config.getString("messages.campus-status-ok", "&aAPI online (&f{url}&a) | servidor &f{slug}")),
-                color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)"))
+                color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)")),
+                color(config.getString("messages.invite-probation-denied", "&cVocê está em probation e não pode convidar.")),
+                color(config.getString("messages.guild-usage", "&eUso: /guild create <nome> | join <id> | leave <id>")),
+                color(config.getString("messages.guild-created", "&aGuilda &f{name}&a criada (&f{slug}&a). ID: &e{id}")),
+                color(config.getString("messages.guild-joined", "&aVocê entrou na guilda.")),
+                color(config.getString("messages.guild-left", "&aVocê saiu da guilda.")),
+                color(config.getString("messages.guild-failed", "&cOperação de guilda falhou.")),
+                color(config.getString("messages.guild-probation-denied", "&cVocê está em probation e não pode usar guildas."))
         );
     }
 
@@ -53,8 +67,19 @@ public record PluginConfig(
                 "usage",
                 "campus usage",
                 "ok {url} {slug}",
-                "error {url}"
+                "error {url}",
+                "probation denied",
+                "guild usage",
+                "guild created",
+                "joined",
+                "left",
+                "failed",
+                "probation denied"
         );
+    }
+
+    public String formatGuildCreated(String name, String slug, String id) {
+        return guildCreated.replace("{name}", name).replace("{slug}", slug).replace("{id}", id);
     }
 
     public String campusStatusOk(String apiUrl, String slug) {

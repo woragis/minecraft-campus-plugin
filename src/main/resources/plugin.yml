@@ -13,10 +13,17 @@ commands:
     description: Utilitários CampusWorld
     usage: /campus status
     permission: campusworld.campus
+  guild:
+    description: Gerencia guildas do CampusWorld
+    usage: /guild <create|join|leave>
+    permission: campusworld.guild
 permissions:
   campusworld.invite:
     description: Permite usar /invite
     default: true
   campusworld.campus:
     description: Permite usar /campus
+    default: true
+  campusworld.guild:
+    description: Permite usar /guild
     default: true
