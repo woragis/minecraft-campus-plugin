@@ -24,7 +24,23 @@ public record PluginConfig(
         String guildJoined,
         String guildLeft,
         String guildFailed,
-        String guildProbationDenied
+        String guildProbationDenied,
+        String claimUsage,
+        String claimCorner1,
+        String claimCorner2,
+        String claimReady,
+        String claimNeedCorners,
+        String claimCreated,
+        String claimDeleted,
+        String claimFailed,
+        String claimCleared,
+        String claimDifferentWorld,
+        String claimProbationDenied,
+        String claimDenied,
+        String cityUsage,
+        String cityCreated,
+        String cityFailed,
+        String cityProbationDenied
 ) {
     public static PluginConfig load(FileConfiguration config) {
         return new PluginConfig(
@@ -48,7 +64,23 @@ public record PluginConfig(
                 color(config.getString("messages.guild-joined", "&aVocê entrou na guilda.")),
                 color(config.getString("messages.guild-left", "&aVocê saiu da guilda.")),
                 color(config.getString("messages.guild-failed", "&cOperação de guilda falhou.")),
-                color(config.getString("messages.guild-probation-denied", "&cVocê está em probation e não pode usar guildas."))
+                color(config.getString("messages.guild-probation-denied", "&cVocê está em probation e não pode usar guildas.")),
+                color(config.getString("messages.claim-usage", "&eUso: /claim mark | create [zona] | delete <id> | clear")),
+                color(config.getString("messages.claim-corner1", "&aCanto 1 marcado: &f{x}&a, &f{z}")),
+                color(config.getString("messages.claim-corner2", "&aCanto 2 marcado: &f{x}&a, &f{z}")),
+                color(config.getString("messages.claim-ready", "&aÁrea definida. Use &f/claim create [zona]&a.")),
+                color(config.getString("messages.claim-need-corners", "&cMarque dois cantos com &f/claim mark&c.")),
+                color(config.getString("messages.claim-created", "&aClaim criado! ID: &e{id}&a | área: &f{area}&a | zona: &f{zone}")),
+                color(config.getString("messages.claim-deleted", "&aClaim removido.")),
+                color(config.getString("messages.claim-failed", "&cOperação de claim falhou.")),
+                color(config.getString("messages.claim-cleared", "&eMarcações de claim limpas.")),
+                color(config.getString("messages.claim-different-world", "&cOs dois cantos devem estar no mesmo mundo.")),
+                color(config.getString("messages.claim-probation-denied", "&cVocê está em probation e não pode reivindicar terreno.")),
+                color(config.getString("messages.claim-denied", "&cVocê não pode alterar blocos neste claim.")),
+                color(config.getString("messages.city-usage", "&eUso: /city create <nome>")),
+                color(config.getString("messages.city-created", "&aCidade &f{name}&a criada (&f{slug}&a). ID: &e{id}")),
+                color(config.getString("messages.city-failed", "&cNão foi possível criar a cidade.")),
+                color(config.getString("messages.city-probation-denied", "&cVocê está em probation e não pode criar cidades."))
         );
     }
 
@@ -74,8 +106,40 @@ public record PluginConfig(
                 "joined",
                 "left",
                 "failed",
+                "probation denied",
+                "claim usage",
+                "corner1 {x} {z}",
+                "corner2 {x} {z}",
+                "ready",
+                "need corners",
+                "created {id} {area} {zone}",
+                "deleted",
+                "failed",
+                "cleared",
+                "different world",
+                "probation denied",
+                "denied",
+                "city usage",
+                "city created",
+                "failed",
                 "probation denied"
         );
+    }
+
+    public String formatClaimCorner1(int x, int z) {
+        return claimCorner1.replace("{x}", String.valueOf(x)).replace("{z}", String.valueOf(z));
+    }
+
+    public String formatClaimCorner2(int x, int z) {
+        return claimCorner2.replace("{x}", String.valueOf(x)).replace("{z}", String.valueOf(z));
+    }
+
+    public String formatClaimCreated(String id, int area, String zone) {
+        return claimCreated.replace("{id}", id).replace("{area}", String.valueOf(area)).replace("{zone}", zone);
+    }
+
+    public String formatCityCreated(String name, String slug, String id) {
+        return cityCreated.replace("{name}", name).replace("{slug}", slug).replace("{id}", id);
     }
 
     public String formatGuildCreated(String name, String slug, String id) {

@@ -2,9 +2,12 @@ package com.woragis.campusworld;
 
 import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.commands.CampusCommand;
+import com.woragis.campusworld.commands.CityCommand;
+import com.woragis.campusworld.commands.ClaimCommand;
 import com.woragis.campusworld.commands.GuildCommand;
 import com.woragis.campusworld.commands.InviteCommand;
 import com.woragis.campusworld.config.PluginConfig;
+import com.woragis.campusworld.listeners.ClaimProtectionListener;
 import com.woragis.campusworld.listeners.PlayerJoinListener;
 import com.woragis.campusworld.listeners.WhitelistListener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,6 +25,7 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new WhitelistListener(this, apiClient, pluginConfig), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, apiClient, pluginConfig), this);
+        getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);
 
         var inviteCommand = getCommand("invite");
         if (inviteCommand != null) {
@@ -44,6 +48,20 @@ public final class CampusWorldPlugin extends JavaPlugin {
             var guild = new GuildCommand(this, apiClient, pluginConfig);
             guildCommand.setExecutor(guild);
             guildCommand.setTabCompleter(guild);
+        }
+
+        var claimCommand = getCommand("claim");
+        if (claimCommand != null) {
+            var claim = new ClaimCommand(this, apiClient, pluginConfig);
+            claimCommand.setExecutor(claim);
+            claimCommand.setTabCompleter(claim);
+        }
+
+        var cityCommand = getCommand("city");
+        if (cityCommand != null) {
+            var city = new CityCommand(this, apiClient, pluginConfig);
+            cityCommand.setExecutor(city);
+            cityCommand.setTabCompleter(city);
         }
 
         getLogger().info("CampusWorld ativo. API: " + pluginConfig.apiBaseUrl() + " | servidor: " + pluginConfig.serverSlug());

@@ -3,6 +3,9 @@ package com.woragis.campusworld.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.woragis.campusworld.api.dto.ApiErrorResponse;
+import com.woragis.campusworld.api.dto.CityResponse;
+import com.woragis.campusworld.api.dto.ClaimPermissionResponse;
+import com.woragis.campusworld.api.dto.ClaimResponse;
 import com.woragis.campusworld.api.dto.GuildResponse;
 import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.api.dto.PlayerResponse;
@@ -94,6 +97,47 @@ public class CampusWorldApiClient {
         return post("/v1/internal/invites", body, InviteResponse.class);
     }
 
+    public CityResponse createCity(UUID founderUuid, String name, String world, int centerX, int centerZ) throws ApiException {
+        Map<String, Object> body = Map.of(
+                "founderUuid", founderUuid.toString(),
+                "name", name,
+                "serverSlug", config.serverSlug(),
+                "world", world,
+                "centerX", centerX,
+                "centerZ", centerZ
+        );
+        return post("/v1/internal/cities", body, CityResponse.class);
+    }
+
+    public ClaimResponse createClaim(UUID ownerUuid, String world, int minX, int maxX, int minZ, int maxZ, String zoneType) throws ApiException {
+        Map<String, Object> body = Map.of(
+                "ownerUuid", ownerUuid.toString(),
+                "serverSlug", config.serverSlug(),
+                "world", world,
+                "minX", minX,
+                "maxX", maxX,
+                "minZ", minZ,
+                "maxZ", maxZ,
+                "zoneType", zoneType
+        );
+        return post("/v1/internal/claims", body, ClaimResponse.class);
+    }
+
+    public void deleteClaim(String claimId, UUID ownerUuid) throws ApiException {
+        Map<String, String> body = Map.of("ownerUuid", ownerUuid.toString());
+        delete("/v1/internal/claims/" + claimId, body, Void.class);
+    }
+
+    public ClaimPermissionResponse checkClaimPermission(UUID minecraftUuid, String world, int x, int z) throws ApiException {
+        String encodedWorld = URLEncoder.encode(world, StandardCharsets.UTF_8);
+        String path = "/v1/internal/claims/permission?minecraftUuid=" + minecraftUuid
+                + "&serverSlug=" + URLEncoder.encode(config.serverSlug(), StandardCharsets.UTF_8)
+                + "&world=" + encodedWorld
+                + "&x=" + x
+                + "&z=" + z;
+        return get(path, ClaimPermissionResponse.class);
+    }
+
     public void close() {
         // HttpClient não precisa de close explícito nesta versão.
     }
@@ -108,6 +152,15 @@ public class CampusWorldApiClient {
         HttpRequest request = baseRequest(path)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        return send(request, type);
+    }
+
+    private <T> T delete(String path, Object body, Class<T> type) throws ApiException {
+        String json = gson.toJson(body);
+        HttpRequest request = baseRequest(path)
+                .header("Content-Type", "application/json")
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(json))
                 .build();
         return send(request, type);
     }

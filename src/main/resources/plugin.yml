@@ -17,6 +17,14 @@ commands:
     description: Gerencia guildas do CampusWorld
     usage: /guild <create|join|leave>
     permission: campusworld.guild
+  claim:
+    description: Reivindica e protege terreno
+    usage: /claim <mark|create|delete|clear>
+    permission: campusworld.claim
+  city:
+    description: Cria cidades do CampusWorld
+    usage: /city create <nome>
+    permission: campusworld.city
 permissions:
   campusworld.invite:
     description: Permite usar /invite
@@ -26,4 +34,10 @@ permissions:
     default: true
   campusworld.guild:
     description: Permite usar /guild
+    default: true
+  campusworld.claim:
+    description: Permite usar /claim
+    default: true
+  campusworld.city:
+    description: Permite usar /city
     default: true
