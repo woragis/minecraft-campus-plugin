@@ -6,8 +6,11 @@ import com.woragis.campusworld.commands.CityCommand;
 import com.woragis.campusworld.commands.ClaimCommand;
 import com.woragis.campusworld.commands.GuildCommand;
 import com.woragis.campusworld.commands.InviteCommand;
+import com.woragis.campusworld.audit.AuditBatchBuffer;
 import com.woragis.campusworld.config.PluginConfig;
+import com.woragis.campusworld.listeners.AuditListener;
 import com.woragis.campusworld.listeners.ClaimProtectionListener;
+import com.woragis.campusworld.rollback.RollbackApplier;
 import com.woragis.campusworld.listeners.PlayerJoinListener;
 import com.woragis.campusworld.listeners.WhitelistListener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,16 +19,20 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
     private PluginConfig pluginConfig;
     private CampusWorldApiClient apiClient;
+    private AuditBatchBuffer auditBatchBuffer;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         pluginConfig = PluginConfig.load(getConfig());
         apiClient = new CampusWorldApiClient(pluginConfig);
+        auditBatchBuffer = new AuditBatchBuffer(this, apiClient);
+        RollbackApplier rollbackApplier = new RollbackApplier(this, apiClient);
 
         getServer().getPluginManager().registerEvents(new WhitelistListener(this, apiClient, pluginConfig), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, apiClient, pluginConfig), this);
         getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);
+        getServer().getPluginManager().registerEvents(new AuditListener(apiClient, pluginConfig, auditBatchBuffer), this);
 
         var inviteCommand = getCommand("invite");
         if (inviteCommand != null) {
@@ -38,7 +45,7 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
         var campusCommand = getCommand("campus");
         if (campusCommand != null) {
-            var campus = new CampusCommand(apiClient, pluginConfig);
+            var campus = new CampusCommand(apiClient, pluginConfig, rollbackApplier);
             campusCommand.setExecutor(campus);
             campusCommand.setTabCompleter(campus);
         }
@@ -69,6 +76,9 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (auditBatchBuffer != null) {
+            auditBatchBuffer.flush();
+        }
         if (apiClient != null) {
             apiClient.close();
         }

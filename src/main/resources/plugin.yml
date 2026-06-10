@@ -11,7 +11,7 @@ commands:
     permission: campusworld.invite
   campus:
     description: Utilitários CampusWorld
-    usage: /campus status
+    usage: /campus status | rollback <jogador> <minutos>
     permission: campusworld.campus
   guild:
     description: Gerencia guildas do CampusWorld
@@ -41,3 +41,6 @@ permissions:
   campusworld.city:
     description: Permite usar /city
     default: true
+  campusworld.admin:
+    description: Permite rollback e moderação avançada
+    default: op

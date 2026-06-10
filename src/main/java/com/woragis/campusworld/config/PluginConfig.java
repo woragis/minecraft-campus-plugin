@@ -40,7 +40,11 @@ public record PluginConfig(
         String cityUsage,
         String cityCreated,
         String cityFailed,
-        String cityProbationDenied
+        String cityProbationDenied,
+        String rollbackUsage,
+        String rollbackDenied,
+        String rollbackPlayerNotFound,
+        String rollbackStarted
 ) {
     public static PluginConfig load(FileConfiguration config) {
         return new PluginConfig(
@@ -55,7 +59,7 @@ public record PluginConfig(
                 color(config.getString("messages.invite-created", "&aConvite criado: &e{code}")),
                 color(config.getString("messages.invite-failed", "&cFalha ao criar convite.")),
                 color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>")),
-                color(config.getString("messages.campus-usage", "&eUso: /campus status")),
+                color(config.getString("messages.campus-usage", "&eUso: /campus status | rollback <jogador> <minutos>")),
                 color(config.getString("messages.campus-status-ok", "&aAPI online (&f{url}&a) | servidor &f{slug}")),
                 color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)")),
                 color(config.getString("messages.invite-probation-denied", "&cVocê está em probation e não pode convidar.")),
@@ -80,7 +84,11 @@ public record PluginConfig(
                 color(config.getString("messages.city-usage", "&eUso: /city create <nome>")),
                 color(config.getString("messages.city-created", "&aCidade &f{name}&a criada (&f{slug}&a). ID: &e{id}")),
                 color(config.getString("messages.city-failed", "&cNão foi possível criar a cidade.")),
-                color(config.getString("messages.city-probation-denied", "&cVocê está em probation e não pode criar cidades."))
+                color(config.getString("messages.city-probation-denied", "&cVocê está em probation e não pode criar cidades.")),
+                color(config.getString("messages.rollback-usage", "&eUso: /campus rollback <jogador> <minutos>")),
+                color(config.getString("messages.rollback-denied", "&cVocê não tem permissão para rollback.")),
+                color(config.getString("messages.rollback-player-not-found", "&cJogador não encontrado.")),
+                color(config.getString("messages.rollback-started", "&aRollback iniciado para &f{player}&a nos últimos &f{minutes}&a min."))
         );
     }
 
@@ -122,8 +130,16 @@ public record PluginConfig(
                 "city usage",
                 "city created",
                 "failed",
-                "probation denied"
+                "probation denied",
+                "rollback usage",
+                "denied",
+                "not found",
+                "started {player} {minutes}"
         );
+    }
+
+    public String rollbackStarted(String player, int minutes) {
+        return rollbackStarted.replace("{player}", player).replace("{minutes}", String.valueOf(minutes));
     }
 
     public String formatClaimCorner1(int x, int z) {

@@ -3,12 +3,15 @@ package com.woragis.campusworld.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.woragis.campusworld.api.dto.ApiErrorResponse;
+import com.woragis.campusworld.api.dto.AuditEventPayload;
 import com.woragis.campusworld.api.dto.CityResponse;
 import com.woragis.campusworld.api.dto.ClaimPermissionResponse;
 import com.woragis.campusworld.api.dto.ClaimResponse;
 import com.woragis.campusworld.api.dto.GuildResponse;
 import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.api.dto.PlayerResponse;
+import com.woragis.campusworld.api.dto.RollbackItemsListResponse;
+import com.woragis.campusworld.api.dto.RollbackResponse;
 import com.woragis.campusworld.api.dto.WhitelistResponse;
 import com.woragis.campusworld.config.PluginConfig;
 
@@ -20,6 +23,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -126,6 +130,30 @@ public class CampusWorldApiClient {
     public void deleteClaim(String claimId, UUID ownerUuid) throws ApiException {
         Map<String, String> body = Map.of("ownerUuid", ownerUuid.toString());
         delete("/v1/internal/claims/" + claimId, body, Void.class);
+    }
+
+    public void ingestAuditEvents(List<AuditEventPayload> events) throws ApiException {
+        post("/v1/internal/audit/events", Map.of("events", events), Void.class);
+    }
+
+    public RollbackResponse createRollback(UUID targetUuid, UUID actorUuid, String world, int windowMinutes) throws ApiException {
+        Map<String, Object> body = Map.of(
+                "targetUuid", targetUuid.toString(),
+                "actorUuid", actorUuid.toString(),
+                "serverSlug", config.serverSlug(),
+                "world", world,
+                "windowMinutes", windowMinutes
+        );
+        return post("/v1/internal/rollbacks", body, RollbackResponse.class);
+    }
+
+    public List<com.woragis.campusworld.api.dto.RollbackItemResponse> listRollbackItems(String rollbackId) throws ApiException {
+        RollbackItemsListResponse response = get("/v1/internal/rollbacks/" + rollbackId + "/items", RollbackItemsListResponse.class);
+        return response == null || response.getItems() == null ? List.of() : response.getItems();
+    }
+
+    public void completeRollback(String rollbackId, int appliedCount) throws ApiException {
+        post("/v1/internal/rollbacks/" + rollbackId + "/complete", Map.of("appliedCount", appliedCount), Void.class);
     }
 
     public ClaimPermissionResponse checkClaimPermission(UUID minecraftUuid, String world, int x, int z) throws ApiException {
