@@ -14,7 +14,10 @@ public record PluginConfig(
         String kickApiError,
         String inviteCreated,
         String inviteFailed,
-        String inviteUsage
+        String inviteUsage,
+        String campusUsage,
+        String campusStatusOk,
+        String campusStatusError
 ) {
     public static PluginConfig load(FileConfiguration config) {
         return new PluginConfig(
@@ -28,7 +31,10 @@ public record PluginConfig(
                 color(config.getString("messages.kick-api-error", "&cCampusWorld indisponível.")),
                 color(config.getString("messages.invite-created", "&aConvite criado: &e{code}")),
                 color(config.getString("messages.invite-failed", "&cFalha ao criar convite.")),
-                color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>"))
+                color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>")),
+                color(config.getString("messages.campus-usage", "&eUso: /campus status")),
+                color(config.getString("messages.campus-status-ok", "&aAPI online (&f{url}&a) | servidor &f{slug}")),
+                color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)"))
         );
     }
 
@@ -44,8 +50,19 @@ public record PluginConfig(
                 "api error",
                 "invite {code}",
                 "invite failed",
-                "usage"
+                "usage",
+                "campus usage",
+                "ok {url} {slug}",
+                "error {url}"
         );
+    }
+
+    public String campusStatusOk(String apiUrl, String slug) {
+        return campusStatusOk.replace("{url}", apiUrl).replace("{slug}", slug);
+    }
+
+    public String campusStatusError(String apiUrl) {
+        return campusStatusError.replace("{url}", apiUrl);
     }
 
     public String formatInviteCreated(String player, String code) {

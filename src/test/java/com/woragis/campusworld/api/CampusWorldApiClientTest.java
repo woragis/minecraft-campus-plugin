@@ -65,6 +65,12 @@ class CampusWorldApiClientTest {
     }
 
     @Test
+    void isApiHealthy() {
+        server.createContext("/health", exchange -> writeJson(exchange, 200, "{\"status\":\"ok\"}"));
+        assertTrue(client.isApiHealthy());
+    }
+
+    @Test
     void createInvite() throws Exception {
         server.createContext("/v1/internal/invites", exchange -> {
             writeJson(exchange, 201, "{\"id\":\"abc\",\"code\":\"CW-TEST01\",\"targetUsername\":\"Alex\",\"status\":\"pending\"}");

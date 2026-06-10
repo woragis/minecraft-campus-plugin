@@ -50,6 +50,23 @@ public class CampusWorldApiClient {
         return post("/v1/internal/players/upsert", body, PlayerResponse.class);
     }
 
+    public boolean isApiHealthy() {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(config.apiBaseUrl() + "/health"))
+                    .timeout(Duration.ofMillis(config.timeoutMs()))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            return false;
+        }
+    }
+
     public InviteResponse createInvite(UUID sponsorUuid, String targetUsername) throws ApiException {
         Map<String, String> body = Map.of(
                 "sponsorUuid", sponsorUuid.toString(),

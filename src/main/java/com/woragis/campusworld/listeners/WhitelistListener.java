@@ -50,7 +50,6 @@ public class WhitelistListener implements Listener {
         }
         return switch (reason.toLowerCase()) {
             case "banned" -> config.kickBanned();
-            case "probation", "active" -> config.kickNotInvited();
             case "not_invited" -> config.kickNotInvited();
             default -> config.kickNotInvited();
         };

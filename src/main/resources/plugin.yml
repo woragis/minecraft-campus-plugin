@@ -9,7 +9,14 @@ commands:
     description: Convida um jogador para o CampusWorld
     usage: /invite <jogador>
     permission: campusworld.invite
+  campus:
+    description: Utilitários CampusWorld
+    usage: /campus status
+    permission: campusworld.campus
 permissions:
   campusworld.invite:
     description: Permite usar /invite
+    default: true
+  campusworld.campus:
+    description: Permite usar /campus
     default: true

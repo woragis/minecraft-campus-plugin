@@ -6,6 +6,7 @@ Plugin Paper do **CampusWorld** — whitelist, convites e sync com a API Go.
 
 - Whitelist no login (`AsyncPlayerPreLoginEvent` → API)
 - `/invite <jogador>` → cria convite no backend
+- `/campus status` → verifica se a API está online
 - Heartbeat no join → `POST /v1/internal/players/upsert`
 
 ## Requisitos

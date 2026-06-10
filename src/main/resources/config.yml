@@ -14,3 +14,6 @@ messages:
   invite-created: "&aConvite criado para &f{player}&a. Código: &e{code}"
   invite-failed: "&cNão foi possível criar o convite. Tente novamente."
   invite-usage: "&eUso: /invite <jogador>"
+  campus-usage: "&eUso: /campus status"
+  campus-status-ok: "&aAPI online (&f{url}&a) | servidor &f{slug}"
+  campus-status-error: "&cAPI offline (&f{url}&c)"
