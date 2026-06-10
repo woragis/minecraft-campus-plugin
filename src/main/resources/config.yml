@@ -1,0 +1,16 @@
+api:
+  base-url: "http://127.0.0.1:8080"
+  plugin-key: "dev-plugin-key"
+  timeout-ms: 5000
+
+server:
+  slug: "vanilla"
+
+messages:
+  kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."
+  kick-banned: "&cVocê está banido do CampusWorld."
+  kick-probation: "&eBem-vindo! Você está em período de avaliação."
+  kick-api-error: "&cCampusWorld indisponível. Tente novamente em instantes."
+  invite-created: "&aConvite criado para &f{player}&a. Código: &e{code}"
+  invite-failed: "&cNão foi possível criar o convite. Tente novamente."
+  invite-usage: "&eUso: /invite <jogador>"

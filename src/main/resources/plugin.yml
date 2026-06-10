@@ -1,0 +1,15 @@
+name: CampusWorld
+version: '${version}'
+main: com.woragis.campusworld.CampusWorldPlugin
+api-version: '1.21'
+description: CampusWorld — whitelist, convites e sync com a API.
+author: woragis
+commands:
+  invite:
+    description: Convida um jogador para o CampusWorld
+    usage: /invite <jogador>
+    permission: campusworld.invite
+permissions:
+  campusworld.invite:
+    description: Permite usar /invite
+    default: true
