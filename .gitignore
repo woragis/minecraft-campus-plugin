@@ -4,3 +4,11 @@ bin/
 out/
 *.iml
 .idea/
+paper-*.jar
+paper-server/world/
+paper-server/world_nether/
+paper-server/world_the_end/
+paper-server/logs/
+paper-server/plugins/.paper-remapped/
+paper-server/plugins/*.jar
+!paper-server/start.bat

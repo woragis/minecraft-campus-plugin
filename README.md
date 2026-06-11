@@ -13,7 +13,7 @@ Plugin Paper do **CampusWorld** — whitelist, convites e sync com a API Go.
 
 ## Requisitos
 
-- **JDK 21** (ou deixar o Gradle baixar via toolchain)
+- **JDK 25** (Paper 26.1+; Gradle baixa via toolchain no `./gradlew build`)
 - Gradle Wrapper (`./gradlew`)
 
 Não é necessário ter Minecraft instalado para **compilar** e rodar **testes unitários**.
@@ -41,10 +41,11 @@ server:
 
 1. Subir backend: `docker compose up -d` (pasta `backend/`)
 2. Bootstrap do fundador: `scripts/bootstrap-first-player.sql`
-3. Baixar [Paper 1.21](https://papermc.io/downloads/paper)
-4. Copiar o `.jar` do plugin para `plugins/`
-5. `java -jar paper.jar` (nogui)
-6. Fundador entra → `/invite <username>` → convidado tenta entrar
+3. Baixar [Paper 26.1](https://papermc.io/downloads/paper) (build 69+)
+4. Copiar `CampusWorld-0.1.0.jar` para `plugins/`
+5. Java 25: `paper-server/start.bat` ou `java -jar paper-26.1.2-69.jar --nogui`
+6. Cliente **Minecraft 26.1** → multiplayer `localhost`
+7. Fundador entra → `/invite <username>` → convidado tenta entrar
 
 ## Estrutura
 
