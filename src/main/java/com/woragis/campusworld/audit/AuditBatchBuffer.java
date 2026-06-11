@@ -4,6 +4,7 @@ import com.woragis.campusworld.CampusWorldPlugin;
 import com.woragis.campusworld.api.ApiException;
 import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.api.dto.AuditEventPayload;
+import com.woragis.campusworld.config.PluginConfig;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,10 +19,11 @@ public final class AuditBatchBuffer {
     private final CampusWorldApiClient api;
     private final ConcurrentLinkedQueue<AuditEventPayload> queue = new ConcurrentLinkedQueue<>();
 
-    public AuditBatchBuffer(CampusWorldPlugin plugin, CampusWorldApiClient api) {
+    public AuditBatchBuffer(CampusWorldPlugin plugin, CampusWorldApiClient api, PluginConfig config) {
         this.plugin = plugin;
         this.api = api;
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::flush, 100L, 100L);
+        long interval = Math.max(20L, config.auditBatchIntervalTicks());
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::flush, interval, interval);
     }
 
     public void enqueue(AuditEventPayload event) {

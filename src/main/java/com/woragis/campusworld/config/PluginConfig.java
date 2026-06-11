@@ -44,7 +44,11 @@ public record PluginConfig(
         String rollbackUsage,
         String rollbackDenied,
         String rollbackPlayerNotFound,
-        String rollbackStarted
+        String rollbackStarted,
+        boolean auditEnabled,
+        boolean claimProtectionEnabled,
+        int claimPermissionCacheTtlTicks,
+        int auditBatchIntervalTicks
 ) {
     public static PluginConfig load(FileConfiguration config) {
         return new PluginConfig(
@@ -88,7 +92,11 @@ public record PluginConfig(
                 color(config.getString("messages.rollback-usage", "&eUso: /campus rollback <jogador> <minutos>")),
                 color(config.getString("messages.rollback-denied", "&cVocê não tem permissão para rollback.")),
                 color(config.getString("messages.rollback-player-not-found", "&cJogador não encontrado.")),
-                color(config.getString("messages.rollback-started", "&aRollback iniciado para &f{player}&a nos últimos &f{minutes}&a min."))
+                color(config.getString("messages.rollback-started", "&aRollback iniciado para &f{player}&a nos últimos &f{minutes}&a min.")),
+                config.getBoolean("features.audit.enabled", true),
+                config.getBoolean("features.claim-protection.enabled", true),
+                config.getInt("features.claim-protection.permission-cache-ttl-ticks", 40),
+                config.getInt("features.audit.batch-interval-ticks", 100)
         );
     }
 
@@ -134,7 +142,11 @@ public record PluginConfig(
                 "rollback usage",
                 "denied",
                 "not found",
-                "started {player} {minutes}"
+                "started {player} {minutes}",
+                true,
+                true,
+                40,
+                100
         );
     }
 

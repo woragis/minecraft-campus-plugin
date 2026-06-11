@@ -6,6 +6,14 @@ api:
 server:
   slug: "vanilla"
 
+features:
+  audit:
+    enabled: true
+    batch-interval-ticks: 100
+  claim-protection:
+    enabled: true
+    permission-cache-ttl-ticks: 40
+
 messages:
   kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."
   kick-banned: "&cVocê está banido do CampusWorld."

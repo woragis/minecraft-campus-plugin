@@ -55,7 +55,8 @@ public class ClaimProtectionListener implements Listener {
             ClaimPermissionResponse response = api.checkClaimPermission(player.getUniqueId(), world, x, z);
             boolean allowed = response.isAllowed();
             permissionCache.put(cacheKey, allowed);
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> permissionCache.remove(cacheKey), 40L);
+            long ttl = Math.max(20L, config.claimPermissionCacheTtlTicks());
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> permissionCache.remove(cacheKey), ttl);
             return allowed;
         } catch (ApiException e) {
             plugin.getLogger().warning("Claim permission check failed: " + e.getMessage());

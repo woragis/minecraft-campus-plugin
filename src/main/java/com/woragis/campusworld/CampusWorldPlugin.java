@@ -26,13 +26,17 @@ public final class CampusWorldPlugin extends JavaPlugin {
         saveDefaultConfig();
         pluginConfig = PluginConfig.load(getConfig());
         apiClient = new CampusWorldApiClient(pluginConfig);
-        auditBatchBuffer = new AuditBatchBuffer(this, apiClient);
+        auditBatchBuffer = pluginConfig.auditEnabled() ? new AuditBatchBuffer(this, apiClient, pluginConfig) : null;
         RollbackApplier rollbackApplier = new RollbackApplier(this, apiClient);
 
         getServer().getPluginManager().registerEvents(new WhitelistListener(this, apiClient, pluginConfig), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, apiClient, pluginConfig), this);
-        getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);
-        getServer().getPluginManager().registerEvents(new AuditListener(apiClient, pluginConfig, auditBatchBuffer), this);
+        if (pluginConfig.claimProtectionEnabled()) {
+            getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);
+        }
+        if (pluginConfig.auditEnabled() && auditBatchBuffer != null) {
+            getServer().getPluginManager().registerEvents(new AuditListener(apiClient, pluginConfig, auditBatchBuffer), this);
+        }
 
         var inviteCommand = getCommand("invite");
         if (inviteCommand != null) {
