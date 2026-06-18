@@ -12,7 +12,9 @@ import com.woragis.campusworld.listeners.AuditListener;
 import com.woragis.campusworld.listeners.ClaimProtectionListener;
 import com.woragis.campusworld.rollback.RollbackApplier;
 import com.woragis.campusworld.listeners.PlayerJoinListener;
+import com.woragis.campusworld.listeners.PlayerQuitListener;
 import com.woragis.campusworld.listeners.WhitelistListener;
+import com.woragis.campusworld.presence.PresenceHeartbeatTask;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CampusWorldPlugin extends JavaPlugin {
@@ -31,6 +33,10 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new WhitelistListener(this, apiClient, pluginConfig), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, apiClient, pluginConfig), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this, apiClient, pluginConfig), this);
+        if (pluginConfig.presenceEnabled()) {
+            new PresenceHeartbeatTask(this, apiClient, pluginConfig).start();
+        }
         if (pluginConfig.claimProtectionEnabled()) {
             getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);
         }

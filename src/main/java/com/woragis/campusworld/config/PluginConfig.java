@@ -47,6 +47,8 @@ public record PluginConfig(
         String rollbackStarted,
         boolean auditEnabled,
         boolean claimProtectionEnabled,
+        boolean presenceEnabled,
+        int presenceHeartbeatIntervalTicks,
         int claimPermissionCacheTtlTicks,
         int auditBatchIntervalTicks
 ) {
@@ -95,6 +97,8 @@ public record PluginConfig(
                 color(config.getString("messages.rollback-started", "&aRollback iniciado para &f{player}&a nos últimos &f{minutes}&a min.")),
                 config.getBoolean("features.audit.enabled", true),
                 config.getBoolean("features.claim-protection.enabled", true),
+                config.getBoolean("features.presence.enabled", true),
+                config.getInt("features.presence.heartbeat-interval-ticks", 1200),
                 config.getInt("features.claim-protection.permission-cache-ttl-ticks", 40),
                 config.getInt("features.audit.batch-interval-ticks", 100)
         );
@@ -145,6 +149,8 @@ public record PluginConfig(
                 "started {player} {minutes}",
                 true,
                 true,
+                true,
+                1200,
                 40,
                 100
         );

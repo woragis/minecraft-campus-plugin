@@ -8,27 +8,37 @@ public final class PlayerSessionCache {
 
     private static final PlayerSessionCache INSTANCE = new PlayerSessionCache();
 
-    private final Map<UUID, String> statusByPlayer = new ConcurrentHashMap<>();
+    private final Map<UUID, SessionEntry> sessions = new ConcurrentHashMap<>();
 
     public static PlayerSessionCache get() {
         return INSTANCE;
     }
 
-    public void put(UUID playerId, String status) {
-        if (playerId != null && status != null) {
-            statusByPlayer.put(playerId, status.toLowerCase());
+    public void put(UUID minecraftUuid, String campusPlayerId, String status) {
+        if (minecraftUuid == null || campusPlayerId == null || status == null) {
+            return;
         }
+        sessions.put(minecraftUuid, new SessionEntry(campusPlayerId, status.toLowerCase()));
     }
 
-    public String status(UUID playerId) {
-        return statusByPlayer.get(playerId);
+    public String campusPlayerId(UUID minecraftUuid) {
+        SessionEntry entry = sessions.get(minecraftUuid);
+        return entry == null ? null : entry.campusPlayerId();
     }
 
-    public boolean isProbation(UUID playerId) {
-        return "probation".equals(status(playerId));
+    public String status(UUID minecraftUuid) {
+        SessionEntry entry = sessions.get(minecraftUuid);
+        return entry == null ? null : entry.status();
     }
 
-    public void remove(UUID playerId) {
-        statusByPlayer.remove(playerId);
+    public boolean isProbation(UUID minecraftUuid) {
+        return "probation".equals(status(minecraftUuid));
+    }
+
+    public void remove(UUID minecraftUuid) {
+        sessions.remove(minecraftUuid);
+    }
+
+    public record SessionEntry(String campusPlayerId, String status) {
     }
 }

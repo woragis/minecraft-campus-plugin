@@ -33,8 +33,8 @@ public class PlayerJoinListener implements Listener {
     private void syncPlayer(Player player) {
         try {
             PlayerResponse response = api.upsertPlayer(player.getUniqueId(), player.getName());
-            if (response != null && response.getStatus() != null) {
-                PlayerSessionCache.get().put(player.getUniqueId(), response.getStatus());
+            if (response != null && response.getId() != null && response.getStatus() != null) {
+                PlayerSessionCache.get().put(player.getUniqueId(), response.getId(), response.getStatus());
             }
         } catch (ApiException e) {
             plugin.getLogger().warning("Upsert falhou para " + player.getName() + ": " + e.getMessage());

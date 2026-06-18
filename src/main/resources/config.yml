@@ -13,6 +13,9 @@ features:
   claim-protection:
     enabled: true
     permission-cache-ttl-ticks: 40
+  presence:
+    enabled: true
+    heartbeat-interval-ticks: 1200
 
 messages:
   kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."

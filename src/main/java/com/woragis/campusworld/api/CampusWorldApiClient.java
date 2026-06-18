@@ -58,6 +58,22 @@ public class CampusWorldApiClient {
         return post("/v1/internal/players/upsert", body, PlayerResponse.class);
     }
 
+    public void presenceOffline(String campusPlayerId, String serverSlug) throws ApiException {
+        Map<String, String> body = Map.of(
+                "playerId", campusPlayerId,
+                "serverSlug", serverSlug
+        );
+        post("/v1/internal/presence/offline", body, Void.class);
+    }
+
+    public void presenceHeartbeat(String campusPlayerId, String serverSlug) throws ApiException {
+        Map<String, String> body = Map.of(
+                "playerId", campusPlayerId,
+                "serverSlug", serverSlug
+        );
+        post("/v1/internal/presence/heartbeat", body, Void.class);
+    }
+
     public boolean isApiHealthy() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
