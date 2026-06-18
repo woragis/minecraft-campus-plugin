@@ -1,0 +1,42 @@
+# CampusWorld Paper + Geyser + Floodgate (cross-play world).
+# Build: docker build -f Dockerfile.crossplay -t campusworld-crossplay .
+
+FROM eclipse-temurin:25-jdk-alpine AS plugin-build
+RUN apk add --no-cache bash
+WORKDIR /build
+COPY gradlew gradle.properties settings.gradle.kts build.gradle.kts ./
+COPY gradle ./gradle
+COPY src ./src
+RUN chmod +x gradlew && ./gradlew build --no-daemon -q
+
+FROM eclipse-temurin:25-jre-alpine AS runtime
+RUN apk add --no-cache curl gettext
+
+ARG PAPER_VERSION=26.1.2
+ARG PAPER_BUILD=69
+
+RUN mkdir -p /opt/paper/plugins \
+  && curl -fL -o /opt/paper/paper.jar \
+    "https://api.papermc.io/v2/projects/paper/versions/${PAPER_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${PAPER_BUILD}.jar" \
+  && curl -fL -o /opt/paper/plugins/Geyser-Spigot.jar \
+    "https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot" \
+  && curl -fL -o /opt/paper/plugins/Floodgate-Spigot.jar \
+    "https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot"
+
+COPY --from=plugin-build /build/build/libs/CampusWorld-*.jar /opt/paper/plugins/CampusWorld.jar
+COPY docker/entrypoint.crossplay.sh /opt/paper/entrypoint.sh
+COPY docker/config.yml.template /opt/paper/config.yml.template
+RUN chmod +x /opt/paper/entrypoint.sh
+
+ENV CAMPUS_API_URL=http://127.0.0.1:8080 \
+    PLUGIN_API_KEY=dev-plugin-key \
+    SERVER_SLUG=crossplay \
+    JAVA_MEMORY_MIN=2G \
+    JAVA_MEMORY_MAX=4G \
+    LEVEL_SEED=
+
+WORKDIR /data
+VOLUME /data
+EXPOSE 25565 19132/udp
+
+ENTRYPOINT ["/opt/paper/entrypoint.sh"]

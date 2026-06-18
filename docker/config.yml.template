@@ -1,0 +1,54 @@
+api:
+  base-url: "${CAMPUS_API_URL}"
+  plugin-key: "${PLUGIN_API_KEY}"
+  timeout-ms: 5000
+
+server:
+  slug: "${SERVER_SLUG}"
+
+features:
+  audit:
+    enabled: true
+    batch-interval-ticks: 100
+  claim-protection:
+    enabled: true
+    permission-cache-ttl-ticks: 40
+
+messages:
+  kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."
+  kick-banned: "&cVocê está banido do CampusWorld."
+  kick-probation: "&eBem-vindo! Você está em período de avaliação."
+  kick-api-error: "&cCampusWorld indisponível. Tente novamente em instantes."
+  invite-created: "&aConvite criado para &f{player}&a. Código: &e{code}"
+  invite-failed: "&cNão foi possível criar o convite. Tente novamente."
+  invite-usage: "&eUso: /invite <jogador>"
+  campus-usage: "&eUso: /campus status | rollback <jogador> <minutos>"
+  campus-status-ok: "&aAPI online (&f{url}&a) | servidor &f{slug}"
+  campus-status-error: "&cAPI offline (&f{url}&c)"
+  invite-probation-denied: "&cVocê está em probation e não pode convidar jogadores."
+  guild-usage: "&eUso: /guild create <nome> | join <id> | leave <id>"
+  guild-created: "&aGuilda &f{name}&a criada (&f{slug}&a). ID: &e{id}"
+  guild-joined: "&aVocê entrou na guilda."
+  guild-left: "&aVocê saiu da guilda."
+  guild-failed: "&cOperação de guilda falhou."
+  guild-probation-denied: "&cVocê está em probation e não pode usar guildas."
+  claim-usage: "&eUso: /claim mark | create [zona] | delete <id> | clear"
+  claim-corner1: "&aCanto 1 marcado: &f{x}&a, &f{z}"
+  claim-corner2: "&aCanto 2 marcado: &f{x}&a, &f{z}"
+  claim-ready: "&aÁrea definida. Use &f/claim create [zona]&a."
+  claim-need-corners: "&cMarque dois cantos com &f/claim mark&c."
+  claim-created: "&aClaim criado! ID: &e{id}&a | área: &f{area}&a | zona: &f{zone}"
+  claim-deleted: "&aClaim removido."
+  claim-failed: "&cOperação de claim falhou."
+  claim-cleared: "&eMarcações de claim limpas."
+  claim-different-world: "&cOs dois cantos devem estar no mesmo mundo."
+  claim-probation-denied: "&cVocê está em probation e não pode reivindicar terreno."
+  claim-denied: "&cVocê não pode alterar blocos neste claim."
+  city-usage: "&eUso: /city create <nome>"
+  city-created: "&aCidade &f{name}&a criada (&f{slug}&a). ID: &e{id}"
+  city-failed: "&cNão foi possível criar a cidade."
+  city-probation-denied: "&cVocê está em probation e não pode criar cidades."
+  rollback-usage: "&eUso: /campus rollback <jogador> <minutos>"
+  rollback-denied: "&cVocê não tem permissão para rollback."
+  rollback-player-not-found: "&cJogador não encontrado."
+  rollback-started: "&aRollback iniciado para &f{player}&a nos últimos &f{minutes}&a min."

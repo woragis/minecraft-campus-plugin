@@ -1,0 +1,27 @@
+# Cross-play: Paper + Geyser + Floodgate (Java and Java on the same map).
+# Usage: docker compose -f docker-compose.crossplay.yml up -d --build
+# API must run separately (backend/).
+
+name: campusworld-crossplay
+
+volumes:
+  crossplay_data:
+
+services:
+  paper:
+    build:
+      context: .
+      dockerfile: Dockerfile.crossplay
+    restart: unless-stopped
+    ports:
+      - "25565:25565"
+      - "19132:19132/udp"
+    environment:
+      CAMPUS_API_URL: ${CAMPUS_API_URL:-http://host.docker.internal:8080}
+      PLUGIN_API_KEY: ${PLUGIN_API_KEY:-dev-plugin-key}
+      SERVER_SLUG: ${SERVER_SLUG:-crossplay}
+      LEVEL_SEED: ${LEVEL_SEED:-}
+      JAVA_MEMORY_MIN: ${JAVA_MEMORY_MIN:-2G}
+      JAVA_MEMORY_MAX: ${JAVA_MEMORY_MAX:-4G}
+    volumes:
+      - crossplay_data:/data
