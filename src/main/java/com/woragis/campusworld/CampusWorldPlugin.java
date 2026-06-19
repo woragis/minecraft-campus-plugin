@@ -63,7 +63,7 @@ public final class CampusWorldPlugin extends JavaPlugin {
 
         var campusCommand = getCommand("campus");
         if (campusCommand != null) {
-            var campus = new CampusCommand(apiClient, pluginConfig, rollbackApplier);
+            var campus = new CampusCommand(this, apiClient, pluginConfig, rollbackApplier);
             campusCommand.setExecutor(campus);
             campusCommand.setTabCompleter(campus);
         }

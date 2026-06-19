@@ -18,6 +18,9 @@ public record PluginConfig(
         String campusUsage,
         String campusStatusOk,
         String campusStatusError,
+        String campusLinkCreated,
+        String campusLinkFailed,
+        String campusLinkWaiting,
         String inviteProbationDenied,
         String guildUsage,
         String guildCreated,
@@ -69,9 +72,12 @@ public record PluginConfig(
                 color(config.getString("messages.invite-created", "&aConvite criado: &e{code}")),
                 color(config.getString("messages.invite-failed", "&cFalha ao criar convite.")),
                 color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>")),
-                color(config.getString("messages.campus-usage", "&eUso: /campus status | rollback <jogador> <minutos>")),
+                color(config.getString("messages.campus-usage", "&eUso: /campus status | link | rollback <jogador> <minutos>")),
                 color(config.getString("messages.campus-status-ok", "&aAPI online (&f{url}&a) | servidor &f{slug}")),
                 color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)")),
+                color(config.getString("messages.campus-link-created", "&aCódigo web: &e{code}&a (expira em &f{seconds}&a s). Use em /conta no site.")),
+                color(config.getString("messages.campus-link-failed", "&cNão foi possível gerar o código web.")),
+                color(config.getString("messages.campus-link-waiting", "&eAguarde a sincronização da conta e tente novamente.")),
                 color(config.getString("messages.invite-probation-denied", "&cVocê está em probation e não pode convidar.")),
                 color(config.getString("messages.guild-usage", "&eUso: /guild create <nome> | join <id> | leave <id>")),
                 color(config.getString("messages.guild-created", "&aGuilda &f{name}&a criada (&f{slug}&a). ID: &e{id}")),
@@ -128,6 +134,9 @@ public record PluginConfig(
                 "campus usage",
                 "ok {url} {slug}",
                 "error {url}",
+                "link {code} {seconds}",
+                "link failed",
+                "link waiting",
                 "probation denied",
                 "guild usage",
                 "guild created",
@@ -198,6 +207,18 @@ public record PluginConfig(
 
     public String campusStatusError(String apiUrl) {
         return campusStatusError.replace("{url}", apiUrl);
+    }
+
+    public String formatCampusLinkCreated(String code, int seconds) {
+        return campusLinkCreated.replace("{code}", code).replace("{seconds}", String.valueOf(seconds));
+    }
+
+    public String campusLinkFailed() {
+        return campusLinkFailed;
+    }
+
+    public String campusLinkWaiting() {
+        return campusLinkWaiting;
     }
 
     public String formatInviteCreated(String player, String code) {

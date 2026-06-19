@@ -1,8 +1,12 @@
 package com.woragis.campusworld.commands;
 
+import com.woragis.campusworld.CampusWorldPlugin;
+import com.woragis.campusworld.api.ApiException;
 import com.woragis.campusworld.api.CampusWorldApiClient;
+import com.woragis.campusworld.api.dto.WebLinkCodeResponse;
 import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.rollback.RollbackApplier;
+import com.woragis.campusworld.session.PlayerSessionCache;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,11 +19,13 @@ import java.util.List;
 import java.util.Locale;
 public class CampusCommand implements CommandExecutor, TabCompleter {
 
+    private final CampusWorldPlugin plugin;
     private final CampusWorldApiClient api;
     private final PluginConfig config;
     private final RollbackApplier rollbackApplier;
 
-    public CampusCommand(CampusWorldApiClient api, PluginConfig config, RollbackApplier rollbackApplier) {
+    public CampusCommand(CampusWorldPlugin plugin, CampusWorldApiClient api, PluginConfig config, RollbackApplier rollbackApplier) {
+        this.plugin = plugin;
         this.api = api;
         this.config = config;
         this.rollbackApplier = rollbackApplier;
@@ -38,6 +44,19 @@ public class CampusCommand implements CommandExecutor, TabCompleter {
             } else {
                 sender.sendMessage(config.campusStatusError(config.apiBaseUrl()));
             }
+            return true;
+        }
+        if ("link".equalsIgnoreCase(args[0])) {
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage("Link só pode ser gerado in-game.");
+                return true;
+            }
+            String campusPlayerId = PlayerSessionCache.get().campusPlayerId(player.getUniqueId());
+            if (campusPlayerId == null) {
+                player.sendMessage(config.campusLinkWaiting());
+                return true;
+            }
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> createWebLink(player, campusPlayerId));
             return true;
         }
         if ("rollback".equalsIgnoreCase(args[0])) {
@@ -77,10 +96,21 @@ public class CampusCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private void createWebLink(Player player, String campusPlayerId) {
+        try {
+            WebLinkCodeResponse response = api.createWebLinkCode(campusPlayerId);
+            String message = config.formatCampusLinkCreated(response.getCode(), response.getExpiresInSeconds());
+            Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(message));
+        } catch (ApiException e) {
+            plugin.getLogger().warning("Web link falhou para " + player.getName() + ": " + e.getMessage());
+            Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(config.campusLinkFailed()));
+        }
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return List.of("status", "rollback");
+            return List.of("status", "link", "rollback");
         }
         if (args.length == 2 && "rollback".equalsIgnoreCase(args[0])) {
             return null;

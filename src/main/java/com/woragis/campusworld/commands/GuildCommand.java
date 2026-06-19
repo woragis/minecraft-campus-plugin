@@ -6,6 +6,7 @@ import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.api.dto.GuildResponse;
 import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.session.PlayerSessionCache;
+import com.woragis.campusworld.util.GuildRefs;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -63,8 +64,8 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage(config.guildProbationDenied());
                     return true;
                 }
-                String guildId = args[1];
-                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> joinGuild(player, guildId));
+                String guildRef = args[1];
+                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> joinGuild(player, guildRef));
             }
             case "leave" -> {
                 if (args.length < 2) {
@@ -90,9 +91,13 @@ public class GuildCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    private void joinGuild(Player player, String guildId) {
+    private void joinGuild(Player player, String guildRef) {
         try {
-            api.joinGuild(guildId, player.getUniqueId());
+            if (GuildRefs.isUuid(guildRef)) {
+                api.joinGuild(guildRef, player.getUniqueId());
+            } else {
+                api.joinGuildBySlug(guildRef, player.getUniqueId());
+            }
             Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(config.guildJoined()));
         } catch (ApiException e) {
             Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(config.guildFailed()));

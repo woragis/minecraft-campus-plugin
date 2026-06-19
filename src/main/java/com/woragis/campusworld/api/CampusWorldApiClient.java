@@ -13,6 +13,7 @@ import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.api.dto.PlayerResponse;
 import com.woragis.campusworld.api.dto.RollbackItemsListResponse;
 import com.woragis.campusworld.api.dto.RollbackResponse;
+import com.woragis.campusworld.api.dto.WebLinkCodeResponse;
 import com.woragis.campusworld.api.dto.WhitelistResponse;
 import com.woragis.campusworld.config.PluginConfig;
 
@@ -117,6 +118,15 @@ public class CampusWorldApiClient {
     public void joinGuild(String guildId, UUID playerUuid) throws ApiException {
         Map<String, String> body = Map.of("playerUuid", playerUuid.toString());
         post("/v1/internal/guilds/" + guildId + "/join", body, Void.class);
+    }
+
+    public void joinGuildBySlug(String slug, UUID playerUuid) throws ApiException {
+        Map<String, String> body = Map.of("playerUuid", playerUuid.toString());
+        post("/v1/internal/guilds/by-slug/" + slug + "/join", body, Void.class);
+    }
+
+    public WebLinkCodeResponse createWebLinkCode(String campusPlayerId) throws ApiException {
+        return post("/v1/internal/web/link-codes", Map.of("playerId", campusPlayerId), WebLinkCodeResponse.class);
     }
 
     public void leaveGuild(String guildId, UUID playerUuid) throws ApiException {
