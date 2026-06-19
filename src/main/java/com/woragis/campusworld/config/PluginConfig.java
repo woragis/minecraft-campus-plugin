@@ -49,6 +49,10 @@ public record PluginConfig(
         boolean claimProtectionEnabled,
         boolean presenceEnabled,
         int presenceHeartbeatIntervalTicks,
+        boolean statsEnabled,
+        boolean hudEnabled,
+        int hudIntervalTicks,
+        boolean hudTabPrefixEnabled,
         int claimPermissionCacheTtlTicks,
         int auditBatchIntervalTicks
 ) {
@@ -99,6 +103,10 @@ public record PluginConfig(
                 config.getBoolean("features.claim-protection.enabled", true),
                 config.getBoolean("features.presence.enabled", true),
                 config.getInt("features.presence.heartbeat-interval-ticks", 1200),
+                config.getBoolean("features.stats.enabled", true),
+                config.getBoolean("features.hud.enabled", true),
+                config.getInt("features.hud.interval-ticks", 200),
+                config.getBoolean("features.hud.tab-prefix", true),
                 config.getInt("features.claim-protection.permission-cache-ttl-ticks", 40),
                 config.getInt("features.audit.batch-interval-ticks", 100)
         );
@@ -151,6 +159,10 @@ public record PluginConfig(
                 true,
                 true,
                 1200,
+                true,
+                true,
+                200,
+                true,
                 40,
                 100
         );

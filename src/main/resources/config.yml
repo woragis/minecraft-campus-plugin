@@ -16,6 +16,12 @@ features:
   presence:
     enabled: true
     heartbeat-interval-ticks: 1200
+  stats:
+    enabled: true
+  hud:
+    enabled: true
+    interval-ticks: 200
+    tab-prefix: true
 
 messages:
   kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."

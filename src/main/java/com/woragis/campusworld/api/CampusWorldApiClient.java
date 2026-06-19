@@ -8,6 +8,7 @@ import com.woragis.campusworld.api.dto.CityResponse;
 import com.woragis.campusworld.api.dto.ClaimPermissionResponse;
 import com.woragis.campusworld.api.dto.ClaimResponse;
 import com.woragis.campusworld.api.dto.GuildResponse;
+import com.woragis.campusworld.api.dto.HudResponse;
 import com.woragis.campusworld.api.dto.InviteResponse;
 import com.woragis.campusworld.api.dto.PlayerResponse;
 import com.woragis.campusworld.api.dto.RollbackItemsListResponse;
@@ -72,6 +73,20 @@ public class CampusWorldApiClient {
                 "serverSlug", serverSlug
         );
         post("/v1/internal/presence/heartbeat", body, Void.class);
+    }
+
+    public void statsIngest(String campusPlayerId, String serverSlug, long sessionSeconds, long mobKills) throws ApiException {
+        Map<String, Object> body = Map.of(
+                "playerId", campusPlayerId,
+                "serverSlug", serverSlug,
+                "sessionSeconds", sessionSeconds,
+                "mobKills", mobKills
+        );
+        post("/v1/internal/stats/ingest", body, Void.class);
+    }
+
+    public HudResponse fetchHud(String campusPlayerId) throws ApiException {
+        return get("/v1/internal/players/" + campusPlayerId + "/hud", HudResponse.class);
     }
 
     public boolean isApiHealthy() {

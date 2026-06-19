@@ -11,9 +11,11 @@ import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.listeners.AuditListener;
 import com.woragis.campusworld.listeners.ClaimProtectionListener;
 import com.woragis.campusworld.rollback.RollbackApplier;
+import com.woragis.campusworld.listeners.MobKillListener;
 import com.woragis.campusworld.listeners.PlayerJoinListener;
 import com.woragis.campusworld.listeners.PlayerQuitListener;
 import com.woragis.campusworld.listeners.WhitelistListener;
+import com.woragis.campusworld.hud.ActionBarTask;
 import com.woragis.campusworld.presence.PresenceHeartbeatTask;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,6 +38,12 @@ public final class CampusWorldPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this, apiClient, pluginConfig), this);
         if (pluginConfig.presenceEnabled()) {
             new PresenceHeartbeatTask(this, apiClient, pluginConfig).start();
+        }
+        if (pluginConfig.statsEnabled()) {
+            getServer().getPluginManager().registerEvents(new MobKillListener(pluginConfig), this);
+        }
+        if (pluginConfig.hudEnabled()) {
+            new ActionBarTask(this, apiClient, pluginConfig).start();
         }
         if (pluginConfig.claimProtectionEnabled()) {
             getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);

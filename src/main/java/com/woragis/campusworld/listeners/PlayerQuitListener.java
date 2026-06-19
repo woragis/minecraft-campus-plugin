@@ -25,21 +25,32 @@ public class PlayerQuitListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        if (!config.presenceEnabled()) {
-            return;
-        }
         Player player = event.getPlayer();
-        String campusPlayerId = PlayerSessionCache.get().campusPlayerId(player.getUniqueId());
-        PlayerSessionCache.get().remove(player.getUniqueId());
-        if (campusPlayerId == null) {
+        PlayerSessionCache.SessionEntry session = PlayerSessionCache.get().take(player.getUniqueId());
+        if (session == null) {
             return;
         }
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                api.presenceOffline(campusPlayerId, config.serverSlug());
-            } catch (ApiException e) {
-                plugin.getLogger().fine("Presence offline falhou para " + player.getName() + ": " + e.getMessage());
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> flushSession(player.getName(), session));
+    }
+
+    private void flushSession(String username, PlayerSessionCache.SessionEntry session) {
+        if (config.statsEnabled()) {
+            long sessionSeconds = PlayerSessionCache.get().sessionSeconds(session);
+            long mobKills = session.mobKills().get();
+            if (sessionSeconds > 0 || mobKills > 0) {
+                try {
+                    api.statsIngest(session.campusPlayerId(), config.serverSlug(), sessionSeconds, mobKills);
+                } catch (ApiException e) {
+                    plugin.getLogger().fine("Stats ingest falhou para " + username + ": " + e.getMessage());
+                }
             }
-        });
+        }
+        if (config.presenceEnabled()) {
+            try {
+                api.presenceOffline(session.campusPlayerId(), config.serverSlug());
+            } catch (ApiException e) {
+                plugin.getLogger().fine("Presence offline falhou para " + username + ": " + e.getMessage());
+            }
+        }
     }
 }
