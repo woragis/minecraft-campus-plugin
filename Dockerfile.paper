@@ -1,8 +1,10 @@
 # CampusWorld Paper server — Java 25, Paper 26.1.2, persistent /data volume.
 # Build: docker build -f Dockerfile.paper -t campusworld-paper .
 
-FROM eclipse-temurin:25-jdk-alpine AS plugin-build
-RUN apk add --no-cache bash
+FROM eclipse-temurin:25-jdk AS plugin-build
+ENV JAVA_HOME=/opt/java/openjdk
+RUN apt-get update && apt-get install -y --no-install-recommends bash \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 COPY gradlew gradle.properties settings.gradle.kts build.gradle.kts ./
 COPY gradle ./gradle
