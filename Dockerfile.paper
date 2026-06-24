@@ -10,14 +10,15 @@ COPY src ./src
 RUN chmod +x gradlew && ./gradlew build --no-daemon -q
 
 FROM eclipse-temurin:25-jre-alpine AS runtime
-RUN apk add --no-cache curl gettext
+RUN apk add --no-cache curl gettext jq
 
 ARG PAPER_VERSION=26.1.2
-ARG PAPER_BUILD=69
 
 RUN mkdir -p /opt/paper/plugins \
-  && curl -fL -o /opt/paper/paper.jar \
-    "https://api.papermc.io/v2/projects/paper/versions/${PAPER_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${PAPER_BUILD}.jar"
+  && PAPER_URL="$(curl -fsSL "https://fill.papermc.io/v3/projects/paper/versions/${PAPER_VERSION}/builds" \
+       | jq -r '[.[] | select(.channel=="STABLE")] | sort_by(.id) | last | .downloads."server:default".url')" \
+  && test -n "$PAPER_URL" \
+  && curl -fL -o /opt/paper/paper.jar "$PAPER_URL"
 
 COPY --from=plugin-build /build/build/libs/CampusWorld-*.jar /opt/paper/plugins/CampusWorld.jar
 COPY docker/entrypoint.sh /opt/paper/entrypoint.sh
