@@ -4,6 +4,7 @@ import com.woragis.campusworld.CampusWorldPlugin;
 import com.woragis.campusworld.api.ApiException;
 import com.woragis.campusworld.api.CampusWorldApiClient;
 import com.woragis.campusworld.config.PluginConfig;
+import com.woragis.campusworld.hud.HudCache;
 import com.woragis.campusworld.session.PlayerSessionCache;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        HudCache.get().remove(player.getUniqueId());
         PlayerSessionCache.SessionEntry session = PlayerSessionCache.get().take(player.getUniqueId());
         if (session == null) {
             return;

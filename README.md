@@ -26,6 +26,22 @@ Não é necessário ter Minecraft instalado para **compilar** e rodar **testes u
 
 Artefato: `build/libs/CampusWorld-0.1.0.jar` → copiar para `plugins/` do Paper.
 
+## Docker (Paper 26.1 + volume)
+
+Build da imagem de produção:
+
+```bash
+docker build -f Dockerfile.paper -t campusworld-paper .
+```
+
+Dev local com volume persistente:
+
+```bash
+docker compose -f docker-compose.paper.yml up -d --build
+```
+
+Deploy na nuvem: [RAILWAY-DEPLOY.md](../docs/RAILWAY-DEPLOY.md).
+
 ## Configuração (`plugins/CampusWorld/config.yml`)
 
 ```yaml

@@ -135,9 +135,14 @@ public class CampusWorldApiClient {
     }
 
     public InviteResponse createInvite(UUID sponsorUuid, String targetUsername) throws ApiException {
+        return createInvite(sponsorUuid, targetUsername, "student");
+    }
+
+    public InviteResponse createInvite(UUID sponsorUuid, String targetUsername, String affiliationType) throws ApiException {
         Map<String, String> body = Map.of(
                 "sponsorUuid", sponsorUuid.toString(),
-                "targetUsername", targetUsername
+                "targetUsername", targetUsername,
+                "affiliationType", affiliationType == null || affiliationType.isBlank() ? "student" : affiliationType
         );
         return post("/v1/internal/invites", body, InviteResponse.class);
     }

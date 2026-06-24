@@ -15,6 +15,11 @@ public record PluginConfig(
         String inviteCreated,
         String inviteFailed,
         String inviteUsage,
+        String joinTitleGuest,
+        String joinSubtitleGuest,
+        String joinTitleStudent,
+        String joinSubtitleStudentActive,
+        String joinSubtitleStudentProbation,
         String campusUsage,
         String campusStatusOk,
         String campusStatusError,
@@ -56,6 +61,7 @@ public record PluginConfig(
         boolean hudEnabled,
         int hudIntervalTicks,
         boolean hudTabPrefixEnabled,
+        boolean hudChatPrefixEnabled,
         int claimPermissionCacheTtlTicks,
         int auditBatchIntervalTicks
 ) {
@@ -71,7 +77,12 @@ public record PluginConfig(
                 color(config.getString("messages.kick-api-error", "&cCampusWorld indisponível.")),
                 color(config.getString("messages.invite-created", "&aConvite criado: &e{code}")),
                 color(config.getString("messages.invite-failed", "&cFalha ao criar convite.")),
-                color(config.getString("messages.invite-usage", "&eUso: /invite <jogador>")),
+                color(config.getString("messages.invite-usage", "&eUso: /invite [guest] <jogador>")),
+                color(config.getString("messages.join-title-guest", "&6Visitante")),
+                color(config.getString("messages.join-subtitle-guest", "&7Bem-vindo ao CampusWorld")),
+                color(config.getString("messages.join-title-student", "&b{university}")),
+                color(config.getString("messages.join-subtitle-student-active", "&aConta ativa · &f{course}")),
+                color(config.getString("messages.join-subtitle-student-probation", "&ePeríodo de avaliação")),
                 color(config.getString("messages.campus-usage", "&eUso: /campus status | link | rollback <jogador> <minutos>")),
                 color(config.getString("messages.campus-status-ok", "&aAPI online (&f{url}&a) | servidor &f{slug}")),
                 color(config.getString("messages.campus-status-error", "&cAPI offline (&f{url}&c)")),
@@ -113,6 +124,7 @@ public record PluginConfig(
                 config.getBoolean("features.hud.enabled", true),
                 config.getInt("features.hud.interval-ticks", 200),
                 config.getBoolean("features.hud.tab-prefix", true),
+                config.getBoolean("features.hud.chat-prefix", true),
                 config.getInt("features.claim-protection.permission-cache-ttl-ticks", 40),
                 config.getInt("features.audit.batch-interval-ticks", 100)
         );
@@ -131,6 +143,11 @@ public record PluginConfig(
                 "invite {code}",
                 "invite failed",
                 "usage",
+                "guest title",
+                "guest subtitle",
+                "student title",
+                "student active",
+                "student probation",
                 "campus usage",
                 "ok {url} {slug}",
                 "error {url}",
@@ -172,9 +189,54 @@ public record PluginConfig(
                 true,
                 200,
                 true,
+                true,
                 40,
                 100
         );
+    }
+
+    public String joinTitleGuest() {
+        return joinTitleGuest;
+    }
+
+    public String joinSubtitleGuest() {
+        return joinSubtitleGuest;
+    }
+
+    public String joinSubtitleStudentProbation() {
+        return joinSubtitleStudentProbation;
+    }
+
+    public String formatJoinTitleStudent(String university, String courseAbbr, String courseName) {
+        return joinTitleStudent
+                .replace("{university}", orFallback(university, "CampusWorld"))
+                .replace("{course}", orFallback(courseAbbr, courseName, "Estudante"))
+                .replace("{courseAbbr}", orFallback(courseAbbr, ""))
+                .replace("{courseName}", orFallback(courseName, ""));
+    }
+
+    public String formatJoinSubtitleStudentActive(String courseName, String courseAbbr) {
+        return joinSubtitleStudentActive
+                .replace("{course}", orFallback(courseAbbr, courseName, ""))
+                .replace("{courseAbbr}", orFallback(courseAbbr, ""))
+                .replace("{courseName}", orFallback(courseName, ""));
+    }
+
+    private static String orFallback(String primary, String fallback) {
+        if (primary != null && !primary.isBlank()) {
+            return primary;
+        }
+        return fallback != null ? fallback : "";
+    }
+
+    private static String orFallback(String primary, String secondary, String fallback) {
+        if (primary != null && !primary.isBlank()) {
+            return primary;
+        }
+        if (secondary != null && !secondary.isBlank()) {
+            return secondary;
+        }
+        return fallback != null ? fallback : "";
     }
 
     public String rollbackStarted(String player, int minutes) {

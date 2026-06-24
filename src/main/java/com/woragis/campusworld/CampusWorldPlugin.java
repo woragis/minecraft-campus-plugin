@@ -9,6 +9,7 @@ import com.woragis.campusworld.commands.InviteCommand;
 import com.woragis.campusworld.audit.AuditBatchBuffer;
 import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.listeners.AuditListener;
+import com.woragis.campusworld.listeners.ChatPrefixListener;
 import com.woragis.campusworld.listeners.ClaimProtectionListener;
 import com.woragis.campusworld.rollback.RollbackApplier;
 import com.woragis.campusworld.listeners.MobKillListener;
@@ -44,6 +45,9 @@ public final class CampusWorldPlugin extends JavaPlugin {
         }
         if (pluginConfig.hudEnabled()) {
             new ActionBarTask(this, apiClient, pluginConfig).start();
+            if (pluginConfig.hudChatPrefixEnabled()) {
+                getServer().getPluginManager().registerEvents(new ChatPrefixListener(pluginConfig), this);
+            }
         }
         if (pluginConfig.claimProtectionEnabled()) {
             getServer().getPluginManager().registerEvents(new ClaimProtectionListener(this, apiClient, pluginConfig), this);

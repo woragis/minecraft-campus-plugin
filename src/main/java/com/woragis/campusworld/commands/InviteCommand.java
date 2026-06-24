@@ -19,6 +19,9 @@ import java.util.Locale;
 
 public class InviteCommand implements CommandExecutor, TabCompleter {
 
+    private static final String AFFILIATION_GUEST = "guest";
+    private static final String AFFILIATION_STUDENT = "student";
+
     private final CampusWorldPlugin plugin;
     private final CampusWorldApiClient api;
     private final PluginConfig config;
@@ -35,12 +38,24 @@ public class InviteCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("Este comando só pode ser usado in-game.");
             return true;
         }
-        if (args.length != 1) {
+        if (args.length < 1 || args.length > 2) {
             player.sendMessage(config.inviteUsage());
             return true;
         }
 
-        String targetUsername = args[0].trim();
+        String affiliationType = AFFILIATION_STUDENT;
+        String targetUsername;
+
+        if (args.length == 2 && "guest".equalsIgnoreCase(args[0])) {
+            affiliationType = AFFILIATION_GUEST;
+            targetUsername = args[1].trim();
+        } else if (args.length == 1) {
+            targetUsername = args[0].trim();
+        } else {
+            player.sendMessage(config.inviteUsage());
+            return true;
+        }
+
         if (targetUsername.isEmpty()) {
             player.sendMessage(config.inviteUsage());
             return true;
@@ -50,13 +65,14 @@ public class InviteCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> handleInvite(player, targetUsername));
+        String finalAffiliationType = affiliationType;
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> handleInvite(player, targetUsername, finalAffiliationType));
         return true;
     }
 
-    private void handleInvite(Player sponsor, String targetUsername) {
+    private void handleInvite(Player sponsor, String targetUsername, String affiliationType) {
         try {
-            InviteResponse invite = api.createInvite(sponsor.getUniqueId(), targetUsername);
+            InviteResponse invite = api.createInvite(sponsor.getUniqueId(), targetUsername, affiliationType);
             String message = config.formatInviteCreated(targetUsername, invite.getCode());
             Bukkit.getScheduler().runTask(plugin, () -> sponsor.sendMessage(message));
         } catch (ApiException e) {
@@ -67,16 +83,29 @@ public class InviteCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length != 1) {
-            return Collections.emptyList();
-        }
-        String prefix = args[0].toLowerCase(Locale.ROOT);
-        List<String> matches = new ArrayList<>();
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (online.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
-                matches.add(online.getName());
+        if (args.length == 1) {
+            String prefix = args[0].toLowerCase(Locale.ROOT);
+            List<String> matches = new ArrayList<>();
+            if ("guest".startsWith(prefix)) {
+                matches.add("guest");
             }
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (online.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
+                    matches.add(online.getName());
+                }
+            }
+            return matches;
         }
-        return matches;
+        if (args.length == 2 && "guest".equalsIgnoreCase(args[0])) {
+            String prefix = args[1].toLowerCase(Locale.ROOT);
+            List<String> matches = new ArrayList<>();
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (online.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
+                    matches.add(online.getName());
+                }
+            }
+            return matches;
+        }
+        return Collections.emptyList();
     }
 }

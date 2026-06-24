@@ -22,6 +22,7 @@ features:
     enabled: true
     interval-ticks: 200
     tab-prefix: true
+    chat-prefix: true
 
 messages:
   kick-not-invited: "&cVocê precisa de um convite para entrar no CampusWorld."
@@ -30,7 +31,12 @@ messages:
   kick-api-error: "&cCampusWorld indisponível. Tente novamente em instantes."
   invite-created: "&aConvite criado para &f{player}&a. Código: &e{code}"
   invite-failed: "&cNão foi possível criar o convite. Tente novamente."
-  invite-usage: "&eUso: /invite <jogador>"
+  invite-usage: "&eUso: /invite [guest] <jogador>"
+  join-title-guest: "&6Visitante"
+  join-subtitle-guest: "&7Bem-vindo ao CampusWorld"
+  join-title-student: "&b{university}"
+  join-subtitle-student-active: "&aConta ativa · &f{course}"
+  join-subtitle-student-probation: "&ePeríodo de avaliação"
   campus-usage: "&eUso: /campus status | link | rollback <jogador> <minutos>"
   campus-link-created: "&aCódigo web: &e{code}&a (expira em &f{seconds}&a s). Use em /conta no site."
   campus-link-failed: "&cNão foi possível gerar o código web."

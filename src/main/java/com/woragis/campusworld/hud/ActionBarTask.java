@@ -8,6 +8,7 @@ import com.woragis.campusworld.config.PluginConfig;
 import com.woragis.campusworld.session.PlayerSessionCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,6 +51,7 @@ public class ActionBarTask extends BukkitRunnable {
                 if (!player.isOnline()) {
                     return;
                 }
+                HudCache.get().put(player.getUniqueId(), hud);
                 player.sendActionBar(formatActionBar(hud));
                 if (config.hudTabPrefixEnabled()) {
                     player.playerListName(formatTabName(player, hud));
@@ -61,26 +63,87 @@ public class ActionBarTask extends BukkitRunnable {
     }
 
     static Component formatActionBar(HudResponse hud) {
-        Component line = Component.text(hud.getUsername(), NamedTextColor.WHITE);
-        if (hud.getStatus() != null && !hud.getStatus().isBlank()) {
-            line = line.append(Component.text(" · ", NamedTextColor.DARK_GRAY))
-                    .append(Component.text(hud.getStatus(), NamedTextColor.GRAY));
+        Component line = Component.empty();
+        boolean hasContent = false;
+
+        if (hud.isGuest()) {
+            line = line.append(Component.text("[Visit] ", NamedTextColor.GOLD));
+            hasContent = true;
         }
+
+        String courseAbbr = hud.getCourseAbbr();
+        if (courseAbbr != null && !courseAbbr.isBlank()) {
+            if (hasContent) {
+                line = line.append(separator());
+            }
+            line = line.append(Component.text(courseAbbr, parseHex(hud.getCourseColorHex(), NamedTextColor.YELLOW)));
+            hasContent = true;
+        }
+
         if (hud.getGuildName() != null && !hud.getGuildName().isBlank()) {
-            line = line.append(Component.text(" · ", NamedTextColor.DARK_GRAY))
-                    .append(Component.text(hud.getGuildName(), NamedTextColor.AQUA));
+            if (hasContent) {
+                line = line.append(separator());
+            }
+            line = line.append(Component.text(hud.getGuildName(), NamedTextColor.AQUA));
             if (hud.getGuildOnlineCount() > 0) {
                 line = line.append(Component.text(" (" + hud.getGuildOnlineCount() + " online)", NamedTextColor.DARK_AQUA));
             }
+            hasContent = true;
         }
+
+        if (!hasContent) {
+            line = Component.text(hud.getUsername(), NamedTextColor.WHITE);
+            if (hud.getStatus() != null && !hud.getStatus().isBlank()) {
+                line = line.append(separator()).append(Component.text(hud.getStatus(), NamedTextColor.GRAY));
+            }
+        }
+
         return line;
     }
 
     static Component formatTabName(Player player, HudResponse hud) {
-        if (hud.getGuildName() == null || hud.getGuildName().isBlank()) {
-            return Component.text(player.getName(), NamedTextColor.WHITE);
+        Component line = Component.empty();
+
+        if (hud.isGuest()) {
+            line = line.append(Component.text("[Visit] ", NamedTextColor.GOLD));
         }
-        return Component.text("[" + hud.getGuildName() + "] ", NamedTextColor.GRAY)
-                .append(Component.text(player.getName(), NamedTextColor.WHITE));
+
+        String courseAbbr = hud.getCourseAbbr();
+        if (courseAbbr != null && !courseAbbr.isBlank()) {
+            line = line.append(Component.text("[" + courseAbbr + "] ", parseHex(hud.getCourseColorHex(), NamedTextColor.YELLOW)));
+        }
+
+        if (hud.getGuildName() != null && !hud.getGuildName().isBlank()) {
+            line = line.append(Component.text("[" + hud.getGuildName() + "] ", NamedTextColor.GRAY));
+        }
+
+        return line.append(Component.text(player.getName(), NamedTextColor.WHITE));
+    }
+
+    public static Component formatChatPrefix(HudResponse hud) {
+        Component prefix = Component.empty();
+
+        if (hud != null && hud.isGuest()) {
+            prefix = prefix.append(Component.text("[Visitante] ", NamedTextColor.GOLD));
+        }
+
+        if (hud != null && hud.getGuildName() != null && !hud.getGuildName().isBlank()) {
+            prefix = prefix.append(Component.text("[" + hud.getGuildName() + "] ", NamedTextColor.AQUA));
+        }
+
+        return prefix;
+    }
+
+    private static Component separator() {
+        return Component.text(" · ", NamedTextColor.DARK_GRAY);
+    }
+
+    static TextColor parseHex(String hex, TextColor fallback) {
+        if (hex == null || hex.isBlank()) {
+            return fallback;
+        }
+        String normalized = hex.startsWith("#") ? hex : "#" + hex;
+        TextColor parsed = TextColor.fromHexString(normalized);
+        return parsed != null ? parsed : fallback;
     }
 }
