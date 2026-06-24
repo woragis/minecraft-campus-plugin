@@ -1,0 +1,38 @@
+# CampusWorld Paper server — Java 25, Paper 26.1.2, persistent /data volume.
+# Build: docker build -f Dockerfile.paper -t campusworld-paper .
+
+FROM eclipse-temurin:25-jdk-alpine AS plugin-build
+RUN apk add --no-cache bash
+WORKDIR /build
+COPY gradlew gradle.properties settings.gradle.kts build.gradle.kts ./
+COPY gradle ./gradle
+COPY src ./src
+RUN chmod +x gradlew && ./gradlew build --no-daemon -q
+
+FROM eclipse-temurin:25-jre-alpine AS runtime
+RUN apk add --no-cache curl gettext
+
+ARG PAPER_VERSION=26.1.2
+ARG PAPER_BUILD=69
+
+RUN mkdir -p /opt/paper/plugins \
+  && curl -fL -o /opt/paper/paper.jar \
+    "https://api.papermc.io/v2/projects/paper/versions/${PAPER_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${PAPER_BUILD}.jar"
+
+COPY --from=plugin-build /build/build/libs/CampusWorld-*.jar /opt/paper/plugins/CampusWorld.jar
+COPY docker/entrypoint.sh /opt/paper/entrypoint.sh
+COPY docker/config.yml.template /opt/paper/config.yml.template
+RUN chmod +x /opt/paper/entrypoint.sh
+
+ENV CAMPUS_API_URL=http://127.0.0.1:8080 \
+    PLUGIN_API_KEY=dev-plugin-key \
+    SERVER_SLUG=vanilla \
+    JAVA_MEMORY_MIN=2G \
+    JAVA_MEMORY_MAX=4G \
+    LEVEL_SEED=
+
+# World data lives on Railway Volume mounted at /data (do not use Dockerfile VOLUME).
+WORKDIR /data
+EXPOSE 25565
+
+ENTRYPOINT ["/opt/paper/entrypoint.sh"]
